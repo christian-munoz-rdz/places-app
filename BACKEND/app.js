@@ -1,24 +1,18 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
+const placesRoutes = require('./routes/places-routes');
+
 const app = express();
-const port = 3000;
 
-// Middleware para analizar datos JSON en el cuerpo de la solicitud
-app.use(bodyParser.json());
+app.use('/api/places', placesRoutes); // => /api/places...
 
-// Ruta de ejemplo
-app.get('/', (req, res) => {
-  res.send('¡Hola Mundo!');
+app.use((error, req, res, next) => {
+  if (res.headerSent) {
+    return next(error);
+  }
+  res.status(error.code || 500);
+  res.json({ message: error.message || 'An unknown error occurred!' });
 });
 
-// Ruta para manejar solicitudes POST
-app.post('/datos', (req, res) => {
-  const datos = req.body;
-  res.send(`Datos recibidos: ${JSON.stringify(datos)}`);
-});
-
-// Iniciar el servidor
-app.listen(port, () => {
-  console.log(`Servidor ejecutándose en <http://localhost>:${port}`);
-});
+app.listen(5000);
